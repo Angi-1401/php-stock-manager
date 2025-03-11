@@ -1,174 +1,144 @@
-// Global constants
+document.addEventListener("DOMContentLoaded", function () {
+  const forms = document.querySelectorAll("form");
 
-const txtRgx = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
-const emailRgx = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const passRgx =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-const notEmptyRgx = /\S/;
+  forms.forEach((form) => {
+    const inputs = form.querySelectorAll("input");
+    const submitButton = form.querySelector('button[type="submit"]');
+    const togglePassword = form.querySelector("#password_toggle");
 
-const txtWarningMsg = "Only letters and spaces are allowed.";
-const emailWarningMsg = "Email must be valid.";
-const passWarningMsg = `
-    Password must be at least 8 characters long and contain at least
-    <br />one uppercase letter,
-    <br />one lowercase letter,
-    <br />one number,
-    <br />and one special characters. ( @$!%*?& )`;
-const notEmptyWarningMsg = "This field cannot be empty.";
+    inputs.forEach((input) => {
+      // Add a custom attribute to password inputs
+      if (input.type === "password") {
+        input.setAttribute("data-type", "password");
+      }
 
-const validatefield = (field, regex, message) => {
-  let error = field.nextElementSibling;
+      input.addEventListener("input", function () {
+        validateInput(input);
+        checkFormValidity(form, submitButton);
+      });
+    });
 
-  if (!regex.test(field.value)) {
-    if (!error || error.tagName !== "SPAN") {
-      error = document.createElement("span");
-      error.innerHTML = message;
-      field.insertAdjacentElement("afterend", error);
+    if (togglePassword) {
+      togglePassword.addEventListener("click", function () {
+        togglePasswordVisibility(form);
+      });
     }
-    return false;
-  } else {
-    if (error && error.tagName === "SPAN") error.remove();
-    return true;
+  });
+
+  /**
+   * Validates the input based on its type and sets an error message if invalid.
+   *
+   * This function checks the input value against a regex pattern determined by the input type.
+   * If the pattern doesn't match, an error message is displayed using showError; otherwise, any
+   * existing error is cleared using clearError.
+   *
+   * @param {HTMLElement} input - The input element to be validated.
+   *   Expected types:
+   *     - "text": Only letters and spaces are allowed.
+   *     - "email": Must be in a valid email format.
+   *     - "password": Must be at least 8 characters long, include uppercase, lowercase, number, and special character.
+   */
+
+  function validateInput(input) {
+    let pattern;
+    let errorMessage = "";
+
+    // Check the custom attribute for password validation
+    const inputType = input.getAttribute("data-type") || input.type;
+
+    if (inputType === "text") {
+      pattern = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
+      errorMessage = "Only letters and spaces are allowed.";
+    } else if (inputType === "email") {
+      pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      errorMessage = "Invalid email format.";
+    } else if (inputType === "password") {
+      pattern =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      errorMessage =
+        "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.";
+    }
+
+    if (pattern && !pattern.test(input.value)) {
+      showError(input, errorMessage);
+    } else {
+      clearError(input);
+    }
   }
-};
 
-const validateForm = (fields, submit) => {
-  let valid = true;
+  /**
+   * Displays an error message near the given input element.
+   *
+   * This function gets the next element sibling of the input element and checks if it is an error message.
+   * If not, it creates a new error message element and inserts it after the input element.
+   * Finally, it sets the text content of the error message element to the given message.
+   *
+   * @param {HTMLElement} input - The input element to show the error message for.
+   * @param {string} message - The error message to be displayed.
+   */
+  function showError(input, message) {
+    let errorElement = input.nextElementSibling;
+    if (!errorElement || !errorElement.classList.contains("error-message")) {
+      errorElement = document.createElement("div");
+      errorElement.classList.add("error-message");
+      input.parentNode.insertBefore(errorElement, input.nextSibling);
+    }
+    errorElement.textContent = message;
+  }
 
-  fields.forEach(({ id, regex, message }) => {
-    const field = document.getElementById(id);
-    if (field.value.trim() !== "")
-      valid = validatefield(field, regex, message) && valid;
-  });
+  /**
+   * Clears any existing error message for the given input element.
+   *
+   * This function looks for the next element sibling of the input element and checks if it is an error message.
+   * If it is, the error message element is removed.
+   *
+   * @param {HTMLElement} input - The input element to clear the error message for.
+   */
+  function clearError(input) {
+    const errorElement = input.nextElementSibling;
+    if (errorElement && errorElement.classList.contains("error-message")) {
+      errorElement.remove();
+    }
+  }
 
-  submit.disabled = !valid;
-};
+  /**
+   * Checks if all inputs in the given form are valid and enables/disables the given submit button accordingly.
+   *
+   * This function iterates over all input elements in the given form and checks if each input has an error message.
+   * If any input has an error message, the submit button is disabled; otherwise, it is enabled.
+   *
+   * @param {HTMLFormElement} form - The form containing the input elements to check.
+   * @param {HTMLButtonElement} submitButton - The submit button to enable or disable based on the form's validity.
+   */
+  function checkFormValidity(form, submitButton) {
+    const inputs = form.querySelectorAll("input");
+    let allValid = true;
 
-const togglePassword = (button, field) => {
-  const type = field.getAttribute("type") === "password" ? "text" : "password";
-  field.setAttribute("type", type);
-  button.textContent = type === "password" ? "Show password" : "Hide password";
-};
+    inputs.forEach((input) => {
+      if (
+        input.nextElementSibling &&
+        input.nextElementSibling.classList.contains("error-message")
+      ) {
+        allValid = false;
+      }
+    });
 
-// Client-side form validation (Sign up form)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("signup_form");
-  if (!form) return;
+    submitButton.disabled = !allValid;
+  }
 
-  const submit = form.querySelector("button[type='submit']");
-  const fields = [
-    { id: "first_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "last_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "email", regex: emailRgx, message: emailWarningMsg },
-    { id: "password", regex: passRgx, message: passWarningMsg },
-  ];
-
-  fields.forEach(({ id }) => {
-    const field = document.getElementById(id);
-    if (field)
-      field.addEventListener("input", () => validateForm(fields, submit));
-  });
-
-  const passwordToggle = document.getElementById("password_toggle");
-  if (passwordToggle)
-    passwordToggle.addEventListener("click", () =>
-      togglePassword(passwordToggle, form.password)
-    );
-});
-
-// Client-side form validation (Sign in form)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("signin_form");
-  if (!form) return;
-
-  const submit = form.querySelector("button[type='submit']");
-  const fields = [
-    { id: "email", regex: notEmptyRgx, message: notEmptyWarningMsg },
-    { id: "password", regex: notEmptyRgx, message: notEmptyWarningMsg },
-  ];
-
-  fields.forEach(({ id }) => {
-    const field = document.getElementById(id);
-    if (field)
-      field.addEventListener("input", () => validateForm(fields, submit));
-  });
-
-  const passwordToggle = document.getElementById("password_toggle");
-  passwordToggle.addEventListener("click", () =>
-    togglePassword(passwordToggle, form.password)
-  );
-});
-
-// Client-side form validation (Profile form)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("profile_form");
-  if (!form) return;
-
-  const submit = form.querySelector("button[type='submit']");
-  const fields = [
-    { id: "first_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "last_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "email", regex: emailRgx, message: emailWarningMsg },
-  ];
-
-  fields.forEach(({ id }) => {
-    const field = document.getElementById(id);
-    if (field)
-      field.addEventListener("input", () => validateForm(fields, submit));
-  });
-});
-
-// Client-side form validation (Change password form)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("change_password_form");
-  if (!form) return;
-
-  const submit = form.querySelector("button[type='submit']");
-  const fields = [
-    { id: "password", regex: notEmptyRgx, message: notEmptyWarningMsg },
-    { id: "password_new", regex: passRgx, message: passWarningMsg },
-  ];
-
-  fields.forEach(({ id }) => {
-    const field = document.getElementById(id);
-    if (field)
-      field.addEventListener("input", () => validateForm(fields, submit));
-  });
-
-  const password = document.getElementById("password");
-  const passwordNew = document.getElementById("password_new");
-  const passwordToggle = document.getElementById("password_toggle");
-  passwordToggle.addEventListener("click", () => {
-    const type =
-      password.getAttribute("type") === "password" ? "text" : "password";
-    password.setAttribute("type", type);
-    passwordNew.setAttribute("type", type);
-    passwordToggle.textContent =
-      type === "password" ? "Show password" : "Hide password";
-  });
-});
-
-// Client-side form validation (Create user form)
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("create_user_form");
-  if (!form) return;
-
-  const submit = form.querySelector("button[type='submit']");
-  const fields = [
-    { id: "first_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "last_name", regex: txtRgx, message: txtWarningMsg },
-    { id: "email", regex: emailRgx, message: emailWarningMsg },
-    { id: "password", regex: passRgx, message: passWarningMsg },
-  ];
-
-  fields.forEach(({ id }) => {
-    const field = document.getElementById(id);
-    if (field)
-      field.addEventListener("input", () => validateForm(fields, submit));
-  });
-
-  const passwordToggle = document.getElementById("password_toggle");
-  passwordToggle.addEventListener("click", () =>
-    togglePassword(passwordToggle, form.password)
-  );
+  /**
+   * Toggles the visibility of all password inputs in the given form.
+   *
+   * This function selects all input elements with the custom attribute "data-type" equal to "password"
+   * and toggles their type attribute between "password" and "text", effectively showing or hiding the
+   * password characters.
+   *
+   * @param {HTMLFormElement} form - The form containing the password inputs to toggle.
+   */
+  function togglePasswordVisibility(form) {
+    const passwordInputs = form.querySelectorAll('input[data-type="password"]');
+    passwordInputs.forEach((input) => {
+      input.type = input.type === "password" ? "text" : "password";
+    });
+  }
 });

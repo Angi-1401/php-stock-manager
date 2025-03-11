@@ -11,25 +11,9 @@ if (!isset($_SESSION['user'])) {
 
 <?php include __DIR__ . '/../src/views/partials/header.php' ?>
 
-<header>
-  <nav>
-    <a href="./profile.php">Profile</a>
-    <a href="./signout.php">Logout</a>
-  </nav>
-</header>
-<main>
-  <aside>
-    <nav>
-      <a href="./dashboard.php">Dashboard</a>
-      <a href="./stocks.php">Stocks</a>
-      <a href="./users.php">Users</a>
-    </nav>
-  </aside>
-  <section>
-    <h1>Dashboard</h1>
-    <p>Welcome, <?= $_SESSION['user']; ?>!</p>
-  </section>
-</main>
-<footer></footer>
+<section>
+  <h1>Dashboard</h1>
+  <p>Welcome, <?= $_SESSION['user']; ?>!</p>
+</section>
 
 <?php include __DIR__ . '/../src/views/partials/footer.php' ?>

@@ -10,3 +10,21 @@
 </head>
 
 <body>
+  <?php if (isset($_SESSION['user'])) : ?>
+    <header>
+      <nav>
+        <a href="./profile.php">Profile</a>
+        <a href="./signout.php">Logout</a>
+      </nav>
+    </header>
+  <?php endif; ?>
+  <main>
+    <aside>
+      <?php if (isset($_SESSION['user'])) : ?>
+        <nav>
+          <a href="./dashboard.php">Dashboard</a>
+          <a href="./stocks.php">Stocks</a>
+          <a href="./users.php">Users</a>
+        </nav>
+      <?php endif; ?>
+    </aside>
