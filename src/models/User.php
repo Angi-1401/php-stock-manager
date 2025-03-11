@@ -119,17 +119,17 @@ class User
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     $query = $this->connection->prepare(
-      "UPDATE users SET password = ?, reset_token = NULL, token_expiration = NULL WHERE id = ?"
+      "UPDATE users SET password = ?, reset_token = NULL, reset_token_expiration = NULL WHERE id = ?"
     );
     return $query->execute([$hashed_password, $id]);
   }
 
-  public function setResetToken($email, $token, $expires_at)
+  public function setResetToken($id, $token, $expires_at)
   {
     $query = $this->connection->prepare(
-      "UPDATE users SET reset_token = ?, reset_token_expiration = ? WHERE email = ?"
+      "UPDATE users SET reset_token = ?, reset_token_expiration = ? WHERE id = ?"
     );
-    return $query->execute([$token, $expires_at, $email]);
+    return $query->execute([$token, $expires_at, $id]);
   }
 
   public function isAdmin($id)

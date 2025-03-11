@@ -4,7 +4,6 @@
   <a href="<?= BASE_URL; ?>/index.php">
     <h1>PHP Stock Manager</h1>
   </a>
-
   <form action="<?= BASE_URL; ?>/signin.php" method="post" id="signin_form">
     <fieldset>
       <legend>Sign in</legend>
@@ -17,7 +16,7 @@
     </fieldset>
     <div>
       <p>Don't have an account? <a href="<?= BASE_URL; ?>/signup.php">Sign up</a></p>
-      <p>Forgot your password? <a href="<?= BASE_URL; ?>/password-reset.php">Reset password</a></p>
+      <p>Forgot your password? <a href="<?= BASE_URL; ?>/forgot-password.php">Reset password</a></p>
     </div>
   </form>
   <?php if (isset($_GET['success']) && $_GET['success'] === '1') : ?>

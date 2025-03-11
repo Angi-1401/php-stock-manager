@@ -115,6 +115,60 @@ class AuthController
     }
   }
 
+  public function forgotPassword()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $email = $_POST['email'];
+      $user = new User();
+      $user_data = $user->fetchOneByEmail($email);
+
+      if ($user_data) {
+        $reset_token = bin2hex(random_bytes(16));
+        $reset_token_expiration = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $user->setResetToken($user_data['id'], $reset_token, $reset_token_expiration);
+
+        $url = BASE_URL . '/reset-password.php?reset_token=' . urlencode($reset_token);
+
+        $mail = new Mail();
+        $mail->sendPasswordResetEmail($email, $url);
+
+        $message = 'A password reset link has been sent to your email.';
+        include __DIR__ . '/../views/forgot-password.view.php';
+      } else {
+        $error = 'Email not found.';
+        include __DIR__ . '/../views/forgot-password.view.php';
+      }
+    } else {
+      include __DIR__ . '/../views/forgot-password.view.php';
+    }
+  }
+
+  public function resetPassword()
+  {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $reset_token = $_POST['reset_token'];
+      $password = $_POST['password'];
+
+      $user = new User();
+      $user_data = $user->fetchOneByResetToken($reset_token);
+
+      if ($user_data) {
+        $user->resetPassword($user_data['id'], $password);
+        $message = 'Your password has been successfully reset.';
+
+        include __DIR__ . '/../views/signin.view.php';
+      } else {
+        $error = 'Invalid or expired reset token.';
+
+        include __DIR__ . '/../views/reset-password.view.php';
+      }
+    } else {
+      $reset_token = $_GET['reset_token'];
+
+      include __DIR__ . '/../views/reset-password.view.php';
+    }
+  }
+
   public function isAdmin($id)
   {
     $user = new User();
