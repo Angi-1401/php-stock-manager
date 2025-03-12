@@ -193,7 +193,7 @@ class AuthController
         $mail->sendPasswordResetEmail($email, $url);
 
         $message = 'A password reset link has been sent to your email.';
-        include ROOT_PATH . '/src/views/forgot-password.view.php';
+        include ROOT_PATH . '/src/views/auth/forgot-password.view.php';
       } else {
         $error = 'Email not found.';
         include ROOT_PATH . '/src/views/auth/forgot-password.view.php';

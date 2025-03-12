@@ -10,9 +10,11 @@ if (!isset($_SESSION['user'])) {
 
 <?php include ROOT_PATH . '/src/views/header.php' ?>
 
-<section>
-  <h1>Dashboard</h1>
-  <p>Welcome, <?= $_SESSION['user']; ?>!</p>
+<section class="flex flex-col items-center md:items-start p-4 w-full">
+  <div class="flex items-center justify-between w-full">
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
+  </div>
+  <p class="text-lg text-gray-600 dark:text-gray-400">Welcome, <?= $_SESSION['user']; ?>!</p>
 </section>
 
 <?php include ROOT_PATH . '/src/views/footer.php' ?>

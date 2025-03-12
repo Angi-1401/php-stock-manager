@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const togglePassword = form.querySelector("#password_toggle");
 
     inputs.forEach((input) => {
-      // Add a custom attribute to password inputs
       if (input.type === "password") {
         input.setAttribute("data-type", "password");
       }
@@ -20,6 +19,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (togglePassword) {
       togglePassword.addEventListener("click", function () {
+        const togglePasswordIcon = this.querySelector("i");
+        togglePasswordIcon.classList.toggle("fa-eye");
+        togglePasswordIcon.classList.toggle("fa-eye-slash");
+
         togglePasswordVisibility(form);
       });
     }
@@ -42,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let pattern;
     let errorMessage = "";
 
-    // Check the custom attribute for password validation
     const inputType = input.getAttribute("data-type") || input.type;
 
     if (inputType === "text") {
@@ -54,8 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (inputType === "password") {
       pattern =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      errorMessage =
-        "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.";
+      errorMessage = `
+      Password must be at least 8 characters long and include<br />
+      one uppercase letter,<br />
+      one lowercase letter,<br />
+      one number,<br />
+      and one special character.
+    `;
     } else if (inputType === "number") {
       pattern = /^[+]?\d+([.]\d+)?$/;
       errorMessage = "Only positive numbers are allowed.";
@@ -69,23 +76,32 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /**
-   * Displays an error message near the given input element.
+   * Shows an error message related to the input element.
    *
-   * This function gets the next element sibling of the input element and checks if it is an error message.
-   * If not, it creates a new error message element and inserts it after the input element.
-   * Finally, it sets the text content of the error message element to the given message.
-   *
-   * @param {HTMLElement} input - The input element to show the error message for.
+   * @param {HTMLElement} input - The input element to be validated.
    * @param {string} message - The error message to be displayed.
    */
   function showError(input, message) {
-    let errorElement = input.nextElementSibling;
-    if (!errorElement || !errorElement.classList.contains("error-message")) {
-      errorElement = document.createElement("div");
-      errorElement.classList.add("error-message");
-      input.parentNode.insertBefore(errorElement, input.nextSibling);
+    let errorElement;
+    const parentDiv =
+      input.closest("#password_container") || input.closest("#name_container");
+
+    if (parentDiv) {
+      errorElement = parentDiv.nextElementSibling;
+      if (!errorElement || !errorElement.classList.contains("error-message")) {
+        errorElement = document.createElement("div");
+        errorElement.classList.add("error-message");
+        parentDiv.parentNode.insertBefore(errorElement, parentDiv.nextSibling);
+      }
+    } else {
+      errorElement = input.nextElementSibling;
+      if (!errorElement || !errorElement.classList.contains("error-message")) {
+        errorElement = document.createElement("div");
+        errorElement.classList.add("error-message");
+        input.parentNode.insertBefore(errorElement, input.nextSibling);
+      }
     }
-    errorElement.textContent = message;
+    errorElement.innerHTML = `<p>${message}</p>`;
   }
 
   /**
@@ -97,9 +113,20 @@ document.addEventListener("DOMContentLoaded", function () {
    * @param {HTMLElement} input - The input element to clear the error message for.
    */
   function clearError(input) {
-    const errorElement = input.nextElementSibling;
-    if (errorElement && errorElement.classList.contains("error-message")) {
-      errorElement.remove();
+    let errorElement;
+    const parentDiv =
+      input.closest("#password_container") || input.closest("#name_container");
+
+    if (parentDiv) {
+      errorElement = parentDiv.nextElementSibling;
+      if (errorElement && errorElement.classList.contains("error-message")) {
+        errorElement.remove();
+      }
+    } else {
+      errorElement = input.nextElementSibling;
+      if (errorElement && errorElement.classList.contains("error-message")) {
+        errorElement.remove();
+      }
     }
   }
 
