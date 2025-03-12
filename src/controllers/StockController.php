@@ -4,35 +4,62 @@ require_once __DIR__ . '/../models/Stock.php';
 
 class StockController
 {
+  /**
+   * Index action.
+   * 
+   * Fetches all stocks and renders the stocks view.
+   * 
+   * @return void
+   */
   public function index()
   {
     $stock = new stock;
     $stocks = $stock->fetchAll();
 
-    include __DIR__ . '/../views/stocks.view.php';
+    include ROOT_PATH . '/src/views/stocks/stocks.view.php';
   }
 
+  /**
+   * Create stock action.
+   * 
+   * Handles the create stock form submission. If the stock does not already exist,
+   * it is created and the user is redirected to the stocks page with a success
+   * message. If the stock already exists, the user is shown an error message on
+   * the create stock page.
+   * 
+   * @return void
+   */
   public function createStock()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $name = $_POST['name'];
       $description = $_POST['description'];
       $price = $_POST['price'];
-      $stock = $_POST['stock'];
+      $quantity = $_POST['quantity'];
 
       $stock = new stock;
-      if ($stock->create($name, $description, $price, $stock)) {
-        header('Location:' . BASE_URL . '/stocks.php?success=1');
+      if ($stock->create($name, $description, $price, $quantity)) {
+        header('Location:' . PAGES_URL . '/stocks/stocks.php?success=1');
         exit;
       } else {
         $error = 'Stock already exists.';
-        include __DIR__ . '/../views/create-stock.view.php';
+        include ROOT_PATH . '/src/views/stocks/create-stock.view.php';
       }
     } else {
-      include __DIR__ . '/../views/create-stock.view.php';
+      include ROOT_PATH . '/src/views/stocks/create-stock.view.php';
     }
   }
 
+  /**
+   * Update stock action.
+   *
+   * Handles the update stock form submission. If the stock exists, it is updated
+   * and the user is redirected to the stocks page with a success message. If the
+   * stock does not exist, the user is shown an error message on the update stock
+   * page.
+   *
+   * @return void
+   */
   public function updateStock()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,24 +67,34 @@ class StockController
       $name = $_POST['name'];
       $description = $_POST['description'];
       $price = $_POST['price'];
-      $stock = $_POST['stock'];
+      $quantity = $_POST['quantity'];
 
       $stock = new stock;
-      if ($stock->update($id, $name, $description, $price, $stock)) {
-        header('Location:' . BASE_URL . '/stocks.php?success=1');
+      if ($stock->update($id, $name, $description, $price, $quantity)) {
+        header('Location:' . PAGES_URL . '/stocks/stocks.php?success=1');
         exit;
       } else {
         $error = 'stock does not exists.';
-        include __DIR__ . '/../views/update-stock.view.php';
+        include ROOT_PATH . '/src/views/stocks/update-stock.view.php';
       }
     } else {
       $stock = new stock;
       $stock_data = $stock->fetchOne($_GET['id']);
 
-      include __DIR__ . '/../views/update-stock.view.php';
+      include ROOT_PATH . '/src/views/stocks/update-stock.view.php';
     }
   }
 
+  /**
+   * Delete stock action.
+   * 
+   * Handles the delete stock form submission. If the stock exists, it is deleted
+   * and the user is redirected to the stocks page with a success message. If the
+   * stock does not exist, the user is shown an error message on the delete stock
+   * page.
+   * 
+   * @return void
+   */
   public function deleteStock()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -65,17 +102,17 @@ class StockController
 
       $stock = new stock;
       if ($stock->delete($id)) {
-        header('Location:' . BASE_URL . '/stocks.php?success=1');
+        header('Location:' . PAGES_URL . '/stocks/stocks.php?success=1');
         exit;
       } else {
         $error = 'stock does not exists.';
-        include __DIR__ . '/../views/delete-stock.view.php';
+        include ROOT_PATH . '/src/views/stocks/delete-stock.view.php';
       }
     } else {
       $stock = new stock;
       $stock_data = $stock->fetchOne($_GET['id']);
 
-      include __DIR__ . '/../views/delete-stock.view.php';
+      include ROOT_PATH . '/src/views/stocks/delete-stock.view.php';
     }
   }
 }

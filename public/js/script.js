@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
    *     - "email": Must be in a valid email format.
    *     - "password": Must be at least 8 characters long, include uppercase, lowercase, number, and special character.
    */
-
   function validateInput(input) {
     let pattern;
     let errorMessage = "";
@@ -57,6 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       errorMessage =
         "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.";
+    } else if (inputType === "number") {
+      pattern = /^[+]?\d+([.]\d+)?$/;
+      errorMessage = "Only positive numbers are allowed.";
     }
 
     if (pattern && !pattern.test(input.value)) {

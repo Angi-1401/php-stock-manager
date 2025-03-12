@@ -4,14 +4,31 @@ require_once __DIR__ . '/../models/User.php';
 
 class UserController
 {
+  /**
+   * Index action
+   * 
+   * Fetches all users and renders the users view
+   *
+   * @return void
+   */
   public function index()
   {
     $user = new User();
     $users = $user->fetchAll();
 
-    include __DIR__ . '/../views/users.view.php';
+    include ROOT_PATH . '/src/views/users/users.view.php';
   }
 
+  /**
+   * Create user action
+   * 
+   * Handles the creation of a user, if the request method is POST.
+   * If the user is created successfully, redirects the user to the users page with a success message.
+   * If the user already exists (i.e. email already exists), renders the create user form with an error message.
+   * If the request method is not POST, renders the create user form.
+   * 
+   * @return void
+   */
   public function createUser()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -24,17 +41,27 @@ class UserController
       $user = new User();
 
       if ($user->create($first_name, $last_name, $email, $password, $role)) {
-        header('Location:' . BASE_URL . '/users.php?success=1');
+        header('Location:' . PAGES_URL . '/users/users.php?success=1');
         exit;
       } else {
         $error = 'Email already exists.';
-        include __DIR__ . '/../views/create-user.view.php';
+        include ROOT_PATH . '/src/views/users/create-user.view.php';
       }
     } else {
-      include __DIR__ . '/../views/create-user.view.php';
+      include ROOT_PATH . '/src/views/users/create-user.view.php';
     }
   }
 
+  /**
+   * Update user action
+   * 
+   * Handles the update of a user, if the request method is POST.
+   * If the user is updated successfully, redirects the user to the users page with a success message.
+   * If the user does not exist (i.e. email does not exist), renders the update user form with an error message.
+   * If the request method is not POST, renders the update user form.
+   * 
+   * @return void
+   */
   public function updateUser()
   {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,19 +74,30 @@ class UserController
       $user = new User();
 
       if ($user->update($id, $first_name, $last_name, $email, $role)) {
-        header('Location:' . BASE_URL . '/users.php?success=1');
+        header('Location:' . PAGES_URL . '/users/users.php?success=1');
         exit;
       } else {
         $error = 'User does not exist.';
-        include __DIR__ . '/../views/update-user.view.php';
+        include ROOT_PATH . '/src/views/users/update-user.view.php';
       }
     } else {
       $user = new User();
       $user_data = $user->fetchOne($_GET['id']);
 
-      include __DIR__ . '/../views/update-user.view.php';
+      include ROOT_PATH . '/src/views/users/update-user.view.php';
     }
   }
+
+  /**
+   * Delete user action
+   * 
+   * Handles the deletion of a user, if the request method is POST.
+   * If the user is deleted successfully, redirects the user to the users page with a success message.
+   * If the user does not exist (i.e. email does not exist), renders the delete user form with an error message.
+   * If the request method is not POST, renders the delete user form.
+   * 
+   * @return void
+   */
 
   public function deleteUser()
   {
@@ -68,17 +106,17 @@ class UserController
       $user = new User();
 
       if ($user->delete($id)) {
-        header('Location:' . BASE_URL . '/users.php?success=1');
+        header('Location:' . PAGES_URL . '/users/users.php?success=1');
         exit;
       } else {
         $error = 'User does not exists.';
-        include __DIR__ . '/../views/delete-user.view.php';
+        include ROOT_PATH . '/src/views/users/delete-user.view.php';
       }
     } else {
       $user = new User();
       $user_data = $user->fetchOne($_GET['id']);
 
-      include __DIR__ . '/../views/delete-user.view.php';
+      include ROOT_PATH . '/src/views/users/delete-user.view.php';
     }
   }
 }
