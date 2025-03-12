@@ -44,7 +44,7 @@ Follow these steps to set up the project on your local machine:
    - Start Apache and MySQL from the XAMPP control panel.
    - Open phpMyAdmin and import the provided SQL file to set up the necessary tables at the database:
      ```sql
-     -- Import the SQL file located at /path/to/php-stock-manager/database/php_stock_manager.sql
+     -- Import the SQL file located at ./php-stock-manager/database/db.sample.sql
      ```
 
 4. **Configure the application**:
